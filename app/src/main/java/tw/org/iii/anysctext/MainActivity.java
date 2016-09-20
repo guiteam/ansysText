@@ -1,21 +1,63 @@
 package tw.org.iii.anysctext;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     private  MyTask mytask;
     private TextView mesg;
+    private ImageView imegeView;
+    private UIHandler handler;
+    private Bitmap bmp ;
+    // Bitmap 圖片處理
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mesg =(TextView)findViewById(R.id.mesg);
+        imegeView =(ImageView)findViewById(R.id.imageView);
+        handler = new UIHandler();
     }
+    public  void text3(View v){
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://www.androidcentral.com/sites/androidcentral.com/files/styles/w700/public/postimages/%5Buid%5D/podcast-ac-new.jpg?itok=tKuELSVP");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection() ;
+                    conn.connect();
+                    bmp = BitmapFactory.decodeStream(conn.getInputStream());
+                    handler.sendEmptyMessage(0);
+                } catch (Exception e) {
+
+                }
+            }
+        }.start();
+
+
+
+
+    }
+    private  class UIHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            imegeView.setImageBitmap(bmp);
+        }
+    }
+
 
     public  void text1(View v){
         mytask = new MyTask();
